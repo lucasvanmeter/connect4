@@ -12,14 +12,21 @@ class Board(list):
 	#
 	#USES PLANAR COORDINATES (EMBED IN R^n IN THE USUAL WAY)
 	#
-	def __init__(self,dimensions=[5,5],win=4):
+	def __init__(self,dimensions=[5,5],win=4,symbols={0:' ',1:'O',2:'X'}):
 		super().__init__(
-			reduce(lambda x,y: [deepcopy(x) for i in range(y)],[0]+dimensions)
+			reduce(lambda x,y: [deepcopy(x) for i in range(y)],[0]+[d for d in reversed(dimensions)])
 		)
+		self.symbols = symbols
 		self.dimensions = dimensions
 		self.win = win
 		self.directions = self.getDirections(len(self.dimensions)) #precomputed for speed
 		
+	def getSymbol(self,player_number):
+			if player_number in self.symbols:
+				return self.symbols[player_number]
+			else:
+				return str(player_number)
+
 	def __getitem__(self,key):
 		if type(key) is int:
 			key = (key,)
@@ -74,6 +81,6 @@ class Board(list):
 	
 	def __str__(self):
 		if len(self.dimensions) is 2:
-			return tabulate([[self[x,self.dimensions[1]-1 - y] for x in range(self.dimensions[0])] for y in range(self.dimensions[1])],tablefmt='grid')
+			return tabulate([[self.getSymbol(self[x,self.dimensions[1]-1 - y]) for x in range(self.dimensions[0])] for y in range(self.dimensions[1])],tablefmt='grid')
 		else:
 			return super().__str__()

@@ -20,6 +20,6 @@ class Human(Player):
 			return self.getInput()
 	
 	def play(self,board):
-		print("The board looks like \n %s" % board)
+		#print("The board looks like \n %s" % board)
 		return self.getInput()
 			
