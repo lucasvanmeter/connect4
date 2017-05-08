@@ -1,8 +1,9 @@
-#Auxillary functions
+#Auxillary functions used for testing.
 def print_board(board):
 	for row in board:
 		print(row)
 
+#The main method we will use to find good plays is to measure the "streaks" on the board. That is how long of a chain does a player have going through a given position on the board.
 def aux_streak(board,row,col,dir,sym):
 	if (0 <= row + dir[0] <= len(board) - 1) and (0 <= col + dir[1] <= len(board[0])-1):
 		if board[row+dir[0]][col+dir[1]] == sym:
@@ -12,35 +13,20 @@ def aux_streak(board,row,col,dir,sym):
 	else:
 		return 0
 
+#We name the directions for readability.
 def pot_str(board,row,col,key):
 	n = aux_streak(board, row, col, [-1,0], key)
 	s = aux_streak(board, row, col, [1,0], key)
-	e = aux_streak(board, row, col, [0,1], key) 
+	e = aux_streak(board, row, col, [0,1], key)
 	w = aux_streak(board, row, col, [0,-1], key)
-	ne = aux_streak(board, row, col, [-1,1], key) 
+	ne = aux_streak(board, row, col, [-1,1], key)
 	sw = aux_streak(board, row, col, [1,-1], key)
-	se = aux_streak(board, row, col, [1,1], key) 
+	se = aux_streak(board, row, col, [1,1], key)
 	nw = aux_streak(board, row, col, [-1,-1], key)
 	return [n + s, ne + sw, e + w, se + nw]
 
-# board = [["1","*","*","*"],["1","1","*","*"],["2","1","*","*"],["1","1","*","*"],["2","2","2","*"]]
-
-# class Position(object):
-# 	def __init__(self, row, col, sym):
-# 		self.row = row
-# 		self.col = col
-# 		self.sym = sym
-
-# class board(object):
-# 	def __init__(self, num_rows, num_cols, empty_sym)
-
-# all_pos = [[Position(board, i, j) for j in range(len(board[0]))] for i in range(len(board))]
-# for row in all_pos:
-# 	for pos in row:
-# 		print [pos.row, pos.col] 
-
 class Bot(object):
-# The robot will have a player number and a difficulty
+# The robot will have a player number and also knows the number of its opponent.
 	def __init__(self, sym, other):
 		self.sym = sym
 		self.other = other
@@ -53,9 +39,6 @@ class Bot(object):
 			for x in range(len(strange_board))] \
 			for y in reversed(range(len(strange_board[0]))) \
 			]
-		# print_board(strange_board)
-		# print(" ")
-		# print_board(board)
 		num_cols = range(len(board[0]))
 		list_cols = [[row[i] for row in board]for i in num_cols]
 		pos_play = {}
@@ -67,15 +50,11 @@ class Bot(object):
 			else:
 				for row in range(len(board)):
 					if 	board[row][i] != 0 and board[row -1][i] == 0:
-						pos_play[i] = row - 1 		 
-		#print "Possible plays", pos_play
-		print(pos_play)
-		# First the bot gathers information about streaks
+						pos_play[i] = row - 1
+		# Now the bot gathers information about streaks for both players.
 		my_moves = {col : pot_str(board,pos_play[col],col,self.sym) for col in pos_play}
-		#print "My streaks", my_moves
 		other_moves = {col: pot_str(board,pos_play[col],col,self.other) for col in pos_play}
-		#print "Enemy streaks", other_moves
-		
+	
 		# Next the bot will evaluate if it can win in the next move
 		for col in my_moves:
 			if 3 in my_moves[col]:
@@ -91,13 +70,8 @@ class Bot(object):
 		# and use this to pick our next move
 		scores = {col:sum(my_moves[col]) + sum(other_moves[col]) for col in pos_play}
 		max_score = max(scores.values())
-		#print "scores for each col", scores
 		for col in pos_play:
 			if scores[col] == max_score:
 				return col
-
-# strange_board = [[1,1,0,0,0],[0,0,0,0,0],[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]
-
-# test_bot = Bot(2,1)
-
-# print(test_bot.play(strange_board))
+				
+		#Currently the main mistake the bot makes is to play a move that allows the other player to win on their next turn. Future work should fix this, possibly by just looking forward a couple of turns.
